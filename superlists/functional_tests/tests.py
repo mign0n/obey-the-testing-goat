@@ -1,10 +1,11 @@
 from django.test import LiveServerTestCase
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import WebDriverException
 import time
 
-MAX_WAIT = 10
+MAX_WAIT = 3
 
 
 class NewVisitorTest(LiveServerTestCase):
@@ -19,7 +20,7 @@ class NewVisitorTest(LiveServerTestCase):
         while True:
             try:
                 table = self.browser.find_element_by_id('id_list_table')
-                rows = table.find_elements_by_tag_name('tr')
+                rows = table.find_elements(By.TAG_NAME, 'tr')
                 self.assertIn(row_text, [row.text for row in rows])
                 return
             except (AssertionError, WebDriverException) as e:
