@@ -6,11 +6,11 @@ authors = ["mign0n <mign0n.git@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-selenium = "^4.1.0"
 Django = "^4.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0"
+selenium = "^4.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
