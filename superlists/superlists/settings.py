@@ -72,6 +72,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'superlists.wsgi.application'
 
+CSRF_TRUSTED_ORIGINS = ['http://ottg.xyz/*']
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
