@@ -17,18 +17,21 @@ import os
 # BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-svuc1zg3!f2ksjn0b#qp$1whzme$6%c*j4*v%@n+8*8bvanb89'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['localhost']
-
+if 'DJANGO_DEBUG_FALSE' in os.environ:
+    SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+    DEBUG = False
+    ALLOWED_HOSTS = [os.environ['SITENAME']]
+    CSRF_TRUSTED_ORIGINS = [f'http://{os.environ['SITENAME']}/*']
+else:
+    # SECURITY WARNING: keep the secret key used in production secret!
+    SECRET_KEY = 'django-insecure-svuc1zg3!f2ksjn0b#qp$1whzme$6%c*j4*v%@n+8*8bvanb89'
+    # SECURITY WARNING: don't run with debug turned on in production!
+    DEBUG = True
+    ALLOWED_HOSTS = []
+    CSRF_TRUSTED_ORIGINS = []
 
 # Application definition
 
@@ -72,8 +75,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'superlists.wsgi.application'
 
-CSRF_TRUSTED_ORIGINS = ['http://ottg.xyz/*']
-
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
@@ -83,7 +84,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, '../database/db.sqlite3'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -103,7 +103,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
@@ -115,7 +114,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
@@ -126,3 +124,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, '../static')
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
