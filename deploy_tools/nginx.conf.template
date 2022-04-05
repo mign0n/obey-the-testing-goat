@@ -1,0 +1,16 @@
+# /etc/nginx/http.d/DOMAIN.conf
+
+server {
+        listen 80;
+        server_name DOMAIN;
+
+        location /static {
+                alias /home/USER/sites/DOMAIN/static;
+        }
+
+        location / {
+                proxy_pass http://unix:/tmp/DOMAIN;
+                proxy_set_header Host $host;
+        }
+
+}

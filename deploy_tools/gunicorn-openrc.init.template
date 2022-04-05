@@ -1,0 +1,33 @@
+#!/sbin/openrc-run
+
+description="Gunicorn server for $domain"                    
+
+pidfile="/run/$RC_SVCNAME/$RC_SVCNAME.pid"
+command="$work_dir/env/bin/gunicorn"
+command_user="$user"
+command_args="--bind unix:/tmp/$RC_SVCNAME.socket
+              --user $command_user
+              --chdir $work_dir/$app
+              $app.wsgi:application"
+command_background="yes"                  
+extra_started_commands="reload"
+                                                                         
+start_pre() {                                                            
+  checkpath --directory --owner $command_user:$command_user --mode 0775 \
+    /run/$RC_SVCNAME /var/log/$RC_SVCNAME
+  set -a          
+  source $env_file
+  set +a       
+}                                      
+                                       
+checkconfig() {                        
+  $command $command_args --check-config
+}                         
+                                
+reload() {                                         
+  checkconfig || return $?                         
+  ebegin "Reloading $RC_SVCNAME"                   
+  start-stop-daemon --signal HUP --pidfile $pidfile
+  eend $?
+}
+
