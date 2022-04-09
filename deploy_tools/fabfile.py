@@ -1,16 +1,20 @@
+import getpass
 import os
 import secrets
 import string
-from fabric import Connection
+from fabric import Connection, Config
 from fabric.tasks import task
 
 REPO_TOKEN = os.environ['REPO_TOKEN']
 REPO_URL = f'https://{REPO_TOKEN}@github.com/mign0n/obey-the-testing-goat.git'
-HOST = 'obey@superlists-staging.local.vm:2233'
 
 @task
 def deploy(context):
-    connection = Connection(HOST) 
+    connection = Connection(
+            host=context.host,
+            user=context.user,
+            port=context.port,
+    ) 
     current_commit = connection.local('git log -n 1 --format=%H').stdout.strip()
     site_folder = f'/home/{connection.user}/sites/{connection.host}'
     connection.run(f'mkdir -p {site_folder}')
@@ -19,7 +23,8 @@ def deploy(context):
         _update_virtualenv(connection)
         _create_or_update_dotenv(connection)
         _update_static_files(connection)
-        _update_database(connection)
+        _update_database(connection, site_folder)
+        _config_web_server(context, site_folder)
 
 
 def _get_latest_source(connection, commit):
@@ -34,23 +39,52 @@ def _get_latest_source(connection, commit):
 def _update_virtualenv(connection):
     if connection.run('test -d virtualenv/bin/pip', warn=True).failed:
         connection.run(f'python3 -m venv env')
+        connection.run(f'./env/bin/python -m pip install -U pip')
     connection.run('./env/bin/pip install -r requirements.txt')
 
 
 def _create_or_update_dotenv(connection):
+    connection.run('echo "DJANGO_DEBUG_FALSE=y" >> .env')
+    connection.run(f'echo "SITENAME={connection.host}" >> .env')
     current_contents = connection.run('cat .env').stdout.strip()
     if 'DJANGO_SECRET_KEY' not in current_contents:
         alphabet = string.ascii_letters + string.digits
         secret_key = ''.join(secrets.choice(alphabet) for i in range(60))
         connection.run(f'echo "DJANGO_SECRET_KEY={secret_key}" > .env')
-    connection.run('echo "DJANGO_DEBUG_FALSE=y" >> .env')
-    connection.run(f'echo "SITENAME={connection.host}" >> .env')
 
 
 def _update_static_files(connection):
     connection.run('./env/bin/python superlists/manage.py collectstatic --noinput')
 
 
-def _update_database(connection):
+def _update_database(connection, site_folder):
+    connection.run(f'mkdir -p {site_folder}/database')
     connection.run('./env/bin/python superlists/manage.py migrate --noinput')
+
+
+def _config_web_server(context, site_folder):
+    sudo_pass = getpass.getpass('Enter sudo password on server: ')
+    config = Config(overrides={'sudo': {'password': sudo_pass}})
+    with Connection(
+            host=context.host,
+            user=context.user,
+            port=context.port,
+            config=config
+            ) as connection:
+        deploy_dir = f'{site_folder}/deploy_tools'
+        sudo_prefix = f'sudo -u root sh -c' 
+        cmd_mv_nginx_conf = f'{sudo_prefix} "mv -f {deploy_dir}/nginx.conf /etc/nginx/http.d/{connection.host}.conf"'
+        cmd_mv_gunicorn_conf = f'{sudo_prefix} "mv -f {deploy_dir}/gunicorn-openrc.conf /etc/conf.d/{connection.host}"'
+        cmd_cp_init_script = f'{sudo_prefix} "cp -f {deploy_dir}/gunicorn-openrc.init.template /etc/init.d/{connection.host}"'
+        cmd_chmod_script = f'{sudo_prefix} "chmod +x /etc/init.d/{connection.host}"'
+        cmd_add_service = f'{sudo_prefix} "rc-update add {connection.host} default"'
+        cmd_start_service = f'{sudo_prefix} "rc-service {connection.host} start"'
+        connection.run(f'cat {deploy_dir}/nginx.conf.template | sed -e "s/DOMAIN/{connection.host}/g" -e "s/USER/{connection.user}/g" | tee {deploy_dir}/nginx.conf')
+        connection.run(f'cat {deploy_dir}/gunicorn-openrc.conf.template | sed -e "s/DOMAIN/{connection.host}/g" -e "s/USER/{connection.user}/g" -e "s/APP/superlists/g" | tee {deploy_dir}/gunicorn-openrc.conf')
+        connection.sudo(cmd_mv_nginx_conf)
+        connection.sudo(cmd_mv_gunicorn_conf)
+        connection.sudo(cmd_cp_init_script)
+        connection.sudo(cmd_chmod_script)
+        connection.sudo(cmd_add_service)
+        connection.sudo(cmd_start_service)
 
