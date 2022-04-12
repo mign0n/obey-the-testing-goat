@@ -9,7 +9,7 @@ server {
         }
 
         location / {
-                proxy_pass http://unix:/tmp/DOMAIN;
+                proxy_pass http://unix:/tmp/DOMAIN.socket;
                 proxy_set_header Host $host;
         }
 
