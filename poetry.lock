@@ -102,7 +102,7 @@ test = ["pytest (>=6.2.0)", "pytest-benchmark", "pytest-cov", "pytest-subtests",
 
 [[package]]
 name = "django"
-version = "4.0.4"
+version = "4.0.6"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 category = "main"
 optional = false
@@ -456,7 +456,7 @@ h11 = ">=0.9.0,<1"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "836f834b33ae7810ca29230c809b795cc621429986db8f2ffeb84dc59dcff2ae"
+content-hash = "bef3f06f35d459d423a5bd2be1bf7a198ae4776d35bf459b36cb35179fb22e90"
 
 [metadata.files]
 asgiref = [
@@ -573,8 +573,8 @@ cryptography = [
     {file = "cryptography-37.0.2.tar.gz", hash = "sha256:f224ad253cc9cea7568f49077007d2263efa57396a2f2f78114066fd54b5c68e"},
 ]
 django = [
-    {file = "Django-4.0.4-py3-none-any.whl", hash = "sha256:07c8638e7a7f548dc0acaaa7825d84b7bd42b10e8d22268b3d572946f1e9b687"},
-    {file = "Django-4.0.4.tar.gz", hash = "sha256:4e8177858524417563cc0430f29ea249946d831eacb0068a1455686587df40b5"},
+    {file = "Django-4.0.6-py3-none-any.whl", hash = "sha256:ca54ebedfcbc60d191391efbf02ba68fb52165b8bf6ccd6fe71f098cac1fe59e"},
+    {file = "Django-4.0.6.tar.gz", hash = "sha256:a67a793ff6827fd373555537dca0da293a63a316fe34cb7f367f898ccca3c3ae"},
 ]
 fabric = [
     {file = "fabric-2.7.0-py2.py3-none-any.whl", hash = "sha256:e8bfe851719a88be24f40ad7e96ac5bf023ce1af650b561d7641ed1eaed55fe5"},
