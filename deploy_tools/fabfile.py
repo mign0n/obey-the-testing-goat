@@ -76,29 +76,30 @@ def _config_web_server(context, site_folder):
     ) as connection:
         deploy_dir = f'{site_folder}/deploy_tools'
         sudo_prefix = 'doas -u root sh -c'
+        print(f'\nDEPLOY_DIR: {deploy_dir}\n')
         connection.run(
-            f'cat {deploy_dir}/nginx.conf.template | sed -e '
-            '"s/DOMAIN/{connection.host}/g" -e '
-            '"s/USER/{connection.user}/g" | tee '
-            '{deploy_dir}/nginx.conf'
+            ('cat {deploy_dir}/nginx.conf.template | sed -e '
+             '"s/DOMAIN/{connection.host}/g" -e '
+             '"s/USER/{connection.user}/g" | tee '
+             '{deploy_dir}/nginx.conf')
         )
         connection.run(
-            f'cat {deploy_dir}/gunicorn-openrc.conf.template | '
-            'sed -e "s/DOMAIN/{connection.host}/g" -e '
-            '"s/USER/{connection.user}/g" -e "s/APP/superlists/g" '
-            '| tee {deploy_dir}/gunicorn-openrc.conf'
+            (f'cat {deploy_dir}/gunicorn-openrc.conf.template | '
+             'sed -e "s/DOMAIN/{connection.host}/g" -e '
+             '"s/USER/{connection.user}/g" -e "s/APP/superlists/g" '
+             '| tee {deploy_dir}/gunicorn-openrc.conf')
         )
         cmd_mv_nginx_conf = (
-            f'{sudo_prefix} "mv -f {deploy_dir}/nginx.conf '
-            '/etc/nginx/http.d/{connection.host}.conf"'
+            (f'{sudo_prefix} "mv -f {deploy_dir}/nginx.conf '
+             '/etc/nginx/http.d/{connection.host}.conf"')
         )
         cmd_mv_gunicorn_conf = (
-            f'{sudo_prefix} "mv -f {deploy_dir}/gunicorn-openrc.conf'
-            ' /etc/conf.d/{connection.host}"'
+            (f'{sudo_prefix} "mv -f {deploy_dir}/gunicorn-openrc.conf'
+             ' /etc/conf.d/{connection.host}"')
         )
         cmd_cp_init_script = (
-            f'{sudo_prefix} "cp -f {deploy_dir}/gunicorn-openrc.init.template '
-            '/etc/init.d/{connection.host}"'
+            (f'{sudo_prefix} "cp -f {deploy_dir}/gunicorn-openrc.init.template'
+             ' /etc/init.d/{connection.host}"')
         )
         cmd_chmod_script = (
             f'{sudo_prefix} "chmod +x /etc/init.d/{connection.host}"'
