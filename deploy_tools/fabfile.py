@@ -78,7 +78,7 @@ def _config_web_server(context, site_folder):
         sudo_prefix = 'doas -u root sh -c'
         print(f'\nDEPLOY_DIR: {deploy_dir}\n')
         connection.run(
-            ('cat {deploy_dir}/nginx.conf.template | sed -e '
+            (f'cat {deploy_dir}/nginx.conf.template | sed -e '
              '"s/DOMAIN/{connection.host}/g" -e '
              '"s/USER/{connection.user}/g" | tee '
              '{deploy_dir}/nginx.conf')
