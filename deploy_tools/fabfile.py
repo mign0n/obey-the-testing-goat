@@ -67,7 +67,7 @@ def _update_database(connection, site_folder):
 
 def _config_web_server(context, site_folder):
     sudo_pass = getpass.getpass('Enter sudo password on server: ')
-    config = Config(overrides={'sudo': {'password': sudo_pass}})
+    config = Config(overrides={'doas': {'password': sudo_pass}})
     with Connection(
             host=context.host,
             user=context.user,
@@ -75,7 +75,7 @@ def _config_web_server(context, site_folder):
             config=config
     ) as connection:
         deploy_dir = f'{site_folder}/deploy_tools'
-        sudo_prefix = 'sudo -u root sh -c'
+        sudo_prefix = 'doas -u root sh -c'
         connection.run(
             f'cat {deploy_dir}/nginx.conf.template | sed -e '
             '"s/DOMAIN/{connection.host}/g" -e '
