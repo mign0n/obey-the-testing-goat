@@ -76,6 +76,18 @@ def _config_web_server(context, site_folder):
     ) as connection:
         deploy_dir = f'{site_folder}/deploy_tools'
         sudo_prefix = 'sudo -u root sh -c'
+        connection.run(
+            f'cat {deploy_dir}/nginx.conf.template | sed -e '
+            '"s/DOMAIN/{connection.host}/g" -e '
+            '"s/USER/{connection.user}/g" | tee '
+            '{deploy_dir}/nginx.conf'
+        )
+        connection.run(
+            f'cat {deploy_dir}/gunicorn-openrc.conf.template | '
+            'sed -e "s/DOMAIN/{connection.host}/g" -e '
+            '"s/USER/{connection.user}/g" -e "s/APP/superlists/g" '
+            '| tee {deploy_dir}/gunicorn-openrc.conf'
+        )
         cmd_mv_nginx_conf = (
             f'{sudo_prefix} "mv -f {deploy_dir}/nginx.conf '
             '/etc/nginx/http.d/{connection.host}.conf"'
@@ -96,18 +108,6 @@ def _config_web_server(context, site_folder):
         )
         cmd_start_service = (
             f'{sudo_prefix} "rc-service {connection.host} start"'
-        )
-        connection.run(
-            f'cat {deploy_dir}/nginx.conf.template | sed -e '
-            '"s/DOMAIN/{connection.host}/g" -e '
-            '"s/USER/{connection.user}/g" | tee '
-            '{deploy_dir}/nginx.conf'
-        )
-        connection.run(
-            f'cat {deploy_dir}/gunicorn-openrc.conf.template | '
-            'sed -e "s/DOMAIN/{connection.host}/g" -e '
-            '"s/USER/{connection.user}/g" -e "s/APP/superlists/g" '
-            '| tee {deploy_dir}/gunicorn-openrc.conf'
         )
         connection.sudo(cmd_mv_nginx_conf)
         connection.sudo(cmd_mv_gunicorn_conf)
