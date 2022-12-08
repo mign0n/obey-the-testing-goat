@@ -1,8 +1,7 @@
-# import getpass
 import os
 import secrets
 import string
-from fabric import Connection  # Config
+from fabric import Connection
 from fabric.tasks import task
 
 REPO_TOKEN = os.environ['REPO_TOKEN']
@@ -74,7 +73,6 @@ def _config_web_server(context, site_folder):
             host=context.host,
             user=context.user,
             port=context.port,
-          # config=config
     ) as connection:
         deploy_dir = f'{site_folder}/deploy_tools'
         sudo_prefix = 'doas -u root sh -c'
