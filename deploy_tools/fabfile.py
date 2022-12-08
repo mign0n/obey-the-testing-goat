@@ -109,10 +109,13 @@ def _config_web_server(context, site_folder):
         cmd_start_service = (
             f'{sudo_prefix} "rc-service {connection.host} start"'
         )
-        connection.run(cmd_mv_nginx_conf, pty=True)
-        connection.run(cmd_mv_gunicorn_conf, pty=True)
-        connection.run(cmd_cp_init_script, pty=True)
-        connection.run(cmd_chmod_script, pty=True)
-        connection.run(cmd_add_service, pty=True)
-        connection.run(cmd_start_service, pty=True)
+        superuser_cmds = [
+            cmd_mv_nginx_conf,
+            cmd_mv_gunicorn_conf,
+            cmd_cp_init_script,
+            cmd_chmod_script,
+            cmd_add_service,
+            cmd_start_service
+        ]
+        connection.run(' && '.join(superuser_cmds), pty=True)
 
