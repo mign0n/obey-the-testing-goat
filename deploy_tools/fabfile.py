@@ -46,6 +46,8 @@ def _update_virtualenv(connection):
 
 
 def _create_or_update_dotenv(connection):
+    if connection.run('test -f .env', warn=True).failed:
+        connection.run('touch .env')
     current_contents = connection.run('cat .env').stdout.strip()
     if 'DJANGO_SECRET_KEY' not in current_contents:
         alphabet = string.ascii_letters + string.digits
