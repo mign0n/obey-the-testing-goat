@@ -11,8 +11,10 @@ Provisioning a new site
 e.g., on Alpine Linux:
 
 ```
-	sudo apk upgrade
-	sudo apk add git nginx python3
+	doas apk upgrade
+	doas apk add git nginx python3
+  doas rc-update add nginx default
+  doas rc-service nginx start
 ```
 
 ## Nginx Virtual Host config
@@ -34,9 +36,9 @@ e.g., on Alpine Linux:
 * start service:
 
 ```
-	sudo chmod +x /etc/init.d/DOMAIN
-	sudo rc-update add DOMAIN default
-	sudo rc-service DOMAIN start
+	doas chmod +x /etc/init.d/DOMAIN
+	doas rc-update add DOMAIN default
+	doas rc-service DOMAIN start
 ```
 
 ## Folder structure
