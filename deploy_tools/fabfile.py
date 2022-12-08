@@ -1,8 +1,8 @@
-import getpass
+# import getpass
 import os
 import secrets
 import string
-from fabric import Connection, Config
+from fabric import Connection  # Config
 from fabric.tasks import task
 
 REPO_TOKEN = os.environ['REPO_TOKEN']
@@ -46,13 +46,13 @@ def _update_virtualenv(connection):
 
 
 def _create_or_update_dotenv(connection):
-    connection.run('echo "DJANGO_DEBUG_FALSE=y" >> .env')
-    connection.run(f'echo "SITENAME={connection.host}" >> .env')
     current_contents = connection.run('cat .env').stdout.strip()
     if 'DJANGO_SECRET_KEY' not in current_contents:
         alphabet = string.ascii_letters + string.digits
         secret_key = ''.join(secrets.choice(alphabet) for i in range(60))
         connection.run(f'echo "DJANGO_SECRET_KEY={secret_key}" > .env')
+    connection.run('echo "DJANGO_DEBUG_FALSE=y" >> .env')
+    connection.run(f'echo "SITENAME={connection.host}" >> .env')
 
 
 def _update_static_files(connection):
@@ -66,13 +66,13 @@ def _update_database(connection, site_folder):
 
 
 def _config_web_server(context, site_folder):
-    sudo_pass = getpass.getpass('Enter sudo password on server: ')
-    config = Config(overrides={'doas': {'password': sudo_pass}})
+    # sudo_pass = getpass.getpass('Enter sudo password on server: ')
+    # config = Config(overrides={'doas': {'password': sudo_pass}})
     with Connection(
             host=context.host,
             user=context.user,
             port=context.port,
-            config=config
+          # config=config
     ) as connection:
         deploy_dir = f'{site_folder}/deploy_tools'
         sudo_prefix = 'doas -u root sh -c'
