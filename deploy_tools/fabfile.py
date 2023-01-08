@@ -1,6 +1,7 @@
 import os
 import secrets
 import string
+
 from fabric import Connection
 from fabric.tasks import task
 
@@ -16,7 +17,8 @@ def deploy(context):
         port=context.port,
     )
     current_commit = connection.local(
-        'git log -n 1 --format=%H').stdout.strip()
+        'git log -n 1 --format=%H'
+    ).stdout.strip()
     site_folder = f'/home/{connection.user}/sites/{connection.host}'
     connection.run(f'mkdir -p {site_folder}')
     with connection.cd(site_folder):
@@ -58,7 +60,8 @@ def _create_or_update_dotenv(connection):
 
 def _update_static_files(connection):
     connection.run(
-        './env/bin/python superlists/manage.py collectstatic --noinput')
+        './env/bin/python superlists/manage.py collectstatic --noinput'
+    )
 
 
 def _update_database(connection, site_folder):
@@ -70,35 +73,39 @@ def _config_web_server(context, site_folder):
     # sudo_pass = getpass.getpass('Enter sudo password on server: ')
     # config = Config(overrides={'doas': {'password': sudo_pass}})
     with Connection(
-            host=context.host,
-            user=context.user,
-            port=context.port,
+        host=context.host,
+        user=context.user,
+        port=context.port,
     ) as connection:
         deploy_dir = f'{site_folder}/deploy_tools'
         sudo_prefix = 'doas -u root sh -c'
         connection.run(
-            (f'cat {deploy_dir}/nginx.conf.template | sed -e '
-             f'"s/DOMAIN/{connection.host}/g" -e '
-             f'"s/USER/{connection.user}/g" | tee '
-             f'{deploy_dir}/nginx.conf')
+            (
+                f'cat {deploy_dir}/nginx.conf.template | sed -e '
+                f'"s/DOMAIN/{connection.host}/g" -e '
+                f'"s/USER/{connection.user}/g" | tee '
+                f'{deploy_dir}/nginx.conf'
+            )
         )
         connection.run(
-            (f'cat {deploy_dir}/gunicorn-openrc.conf.template | '
-             f'sed -e "s/DOMAIN/{connection.host}/g" -e '
-             f'"s/USER/{connection.user}/g" -e "s/APP/superlists/g" '
-             f'| tee {deploy_dir}/gunicorn-openrc.conf')
+            (
+                f'cat {deploy_dir}/gunicorn-openrc.conf.template | '
+                f'sed -e "s/DOMAIN/{connection.host}/g" -e '
+                f'"s/USER/{connection.user}/g" -e "s/APP/superlists/g" '
+                f'| tee {deploy_dir}/gunicorn-openrc.conf'
+            )
         )
         cmd_mv_nginx_conf = (
-            (f'{sudo_prefix} "mv -f {deploy_dir}/nginx.conf '
-             f'/etc/nginx/http.d/{connection.host}.conf"')
+            f'{sudo_prefix} "mv -f {deploy_dir}/nginx.conf '
+            f'/etc/nginx/http.d/{connection.host}.conf"'
         )
         cmd_mv_gunicorn_conf = (
-            (f'{sudo_prefix} "mv -f {deploy_dir}/gunicorn-openrc.conf'
-             f' /etc/conf.d/{connection.host}"')
+            f'{sudo_prefix} "mv -f {deploy_dir}/gunicorn-openrc.conf'
+            f' /etc/conf.d/{connection.host}"'
         )
         cmd_cp_init_script = (
-            (f'{sudo_prefix} "cp -f {deploy_dir}/gunicorn-openrc.init.template'
-             f' /etc/init.d/{connection.host}"')
+            f'{sudo_prefix} "cp -f {deploy_dir}/gunicorn-openrc.init.template'
+            f' /etc/init.d/{connection.host}"'
         )
         cmd_chmod_script = (
             f'{sudo_prefix} "chmod +x /etc/init.d/{connection.host}"'
@@ -115,7 +122,6 @@ def _config_web_server(context, site_folder):
             cmd_cp_init_script,
             cmd_chmod_script,
             cmd_add_service,
-            cmd_start_service
+            cmd_start_service,
         ]
         connection.run(' && '.join(superuser_cmds), pty=True)
-

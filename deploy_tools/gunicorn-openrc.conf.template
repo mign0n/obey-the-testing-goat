@@ -1,8 +1,8 @@
 # Configuration for /etc/init.d/DOMAIN
 # /etc/conf.d/DOMAIN
 
-user="USER"                                            
-domain="DOMAIN"                        
-work_dir="/home/$user/sites/$domain"                        
-app="APP"
-env_file="$work_dir/.env"
+user = "USER"
+domain = "DOMAIN"
+work_dir = "/home/$user/sites/$domain"
+app = "APP"
+env_file = "$work_dir/.env"

@@ -55,4 +55,3 @@ e.g., on Alpine Linux:
             ├── static
             ├── APP
             └── tests
-
