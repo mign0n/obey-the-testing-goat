@@ -10,9 +10,30 @@ Django = "^4.0.1"
 gunicorn = "^20.1.0"
 fabric = "^2.7.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"
 selenium = "^4.1.0"
+black = "^22.12.0"
+flake8 = "^6.0.0"
+isort = "^5.11.4"
+pep8-naming = "^0.13.3"
+flake8-isort = "^6.0.0"
+flake8-return = "^1.2.0"
+flake8-pyprojecttoml = "^0.0.2"
+
+[tool.black]
+exclude = [".git", ".idea", ".venv"]
+line-length = 79
+
+[tool.flake8]
+ignore = ["W503"]
+max-complexity = 10
+max-line-length = 79
+extend-exclude = [".venv"]
+
+[tool.isort]
+profile = "black"
+src_paths = "."
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
