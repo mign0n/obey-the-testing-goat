@@ -1,10 +1,11 @@
+import os
+import time
+
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import WebDriverException
-import time
-import os
 
 MAX_WAIT = 3
 
@@ -45,8 +46,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         # She is invited to enter a to-do item straight away
         inputbox = self.browser.find_element(By.ID, 'id_new_item')
         self.assertEqual(
-            inputbox.get_attribute('placeholder'),
-            'Enter a to-do item'
+            inputbox.get_attribute('placeholder'), 'Enter a to-do item'
         )
 
         # She types "Buy peacock feathers" into a text box (Edith's hobby
@@ -66,11 +66,12 @@ class NewVisitorTest(StaticLiveServerTestCase):
         inputbox.send_keys(Keys.ENTER)
 
         # The page updates again, and now shows both items on her list
-        self.wait_for_row_in_list_table('2: Use peacock feathers to make a fly')
+        self.wait_for_row_in_list_table(
+            '2: Use peacock feathers to make a fly'
+        )
         self.wait_for_row_in_list_table('1: Buy peacock feathers')
 
         # Satisfied, she goes sleep
-
 
     def test_multiple_users_can_start_lists_at_differrent_urls(self):
         # Edith starts a new to-do list
@@ -86,12 +87,12 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
         # Now a new user, Francis, comes along to the site.
 
-        ## We use a new browser session to make sure that no information
-        ## of Edith's is coming through from cookies etc
+        # We use a new browser session to make sure that no information
+        # of Edith's is coming through from cookies etc
         self.browser.quit()
         self.browser = webdriver.Firefox()
 
-        # Fransis visit the home page. There is no sign of Edith's list
+        # Francis visit the home page. There is no sign of Edith's list
         self.browser.get(self.live_server_url)
         page_text = self.browser.find_element(By.TAG_NAME, 'body').text
         self.assertNotIn('Buy a peacock feathers', page_text)
@@ -114,7 +115,6 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.assertNotIn('Buy a peacock feathers', page_text)
         self.assertIn('Buy milk', page_text)
 
-
     def test_layout_and_styling(self):
         # Edith goes to the home page
         self.browser.get(self.live_server_url)
@@ -123,19 +123,15 @@ class NewVisitorTest(StaticLiveServerTestCase):
         # She notices the input box is nicely centered
         inputbox = self.browser.find_element(By.ID, 'id_new_item')
         self.assertAlmostEqual(
-            inputbox.location['x'] + inputbox.size['width'] / 2,
-            512,
-            delta=10
+            inputbox.location['x'] + inputbox.size['width'] / 2, 512, delta=10
         )
 
-        # She starts a new list and sees the input box is nicely centered there too
+        # She starts a new list and sees the input box is nicely centered
+        # there too
         inputbox.send_keys('testing')
         inputbox.send_keys(Keys.ENTER)
         self.wait_for_row_in_list_table('1: testing')
         inputbox = self.browser.find_element(By.ID, 'id_new_item')
         self.assertAlmostEqual(
-            inputbox.location['x'] + inputbox.size['width'] / 2,
-            512,
-            delta=10
+            inputbox.location['x'] + inputbox.size['width'] / 2, 512, delta=10
         )
-

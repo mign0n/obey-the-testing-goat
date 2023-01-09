@@ -30,7 +30,7 @@ skip-string-normalization = "true"
 ignore = ["W503"]
 max-complexity = 10
 max-line-length = 79
-extend-exclude = [".venv"]
+extend-exclude = [".venv", "migrations", "*.template", "*.md"]
 
 [tool.isort]
 profile = "black"

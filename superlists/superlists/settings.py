@@ -26,7 +26,9 @@ if 'DJANGO_DEBUG_FALSE' in os.environ:
     CSRF_TRUSTED_ORIGINS = [f"http://{os.environ['SITENAME']}/*"]
 else:
     # SECURITY WARNING: keep the secret key used in production secret!
-    SECRET_KEY = 'django-insecure-svuc1zg3!f2ksjn0b#qp$1whzme$6%c*j4*v%@n+8*8bvanb89'
+    SECRET_KEY = (
+        'django-insecure-svuc1zg3!f2ksjn0b#qp$1whzme$6%c*j4*v%@n+8*8bvanb89'
+    )
     # SECURITY WARNING: don't run with debug turned on in production!
     DEBUG = True
     ALLOWED_HOSTS = []
@@ -123,4 +125,3 @@ STATIC_ROOT = os.path.join(BASE_DIR, '../static')
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
